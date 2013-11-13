@@ -143,7 +143,6 @@ GmIssuesPieGraphDirective = () -> (scope, elm, attrs) ->
             legend:
                 show: false
             colors: _.map(_.values(dataToDraw), (d) -> d.color)
-            labels: _.map(_.values(dataToDraw), (d) -> d.name)
 
 
         plot = element.plot(data, options).data("plot")
@@ -172,41 +171,46 @@ GmIssuesAccumulatedGraphDirective = () -> (scope, elm, attrs) ->
             return result
 
         width = element.width()
-        height = width/2
-        chart = $("<canvas />").attr("width", width).attr("height", height)
+        element.height(width / 2)
 
-        element.empty()
-        element.append(chart)
-
-        ctx = chart.get(0).getContext("2d")
-
-        options =
-            animation: false
-            scaleFontFamily : "'ColabThi'"
-            scaleFontSize : 10
-            datasetFillXAxis: 0
-            datasetFillYAxis: 0
-
-
-        data = {}
-        data.labels = _.map([27..0], (x) ->
-            moment().subtract('days', x).date()
+        days = _.map([27..0], (x) ->
+            moment().subtract('days', x)
         )
-        data.datasets = []
-        for row in dataToDraw
+        data = []
+        for d in _.values(dataToDraw)
             if accumulated_data?
-                accumulated_data = vectorsSum(accumulated_data, row.data)
+                accumulated_data = vectorsSum(accumulated_data, d.data)
             else
-                accumulated_data = row.data
+                accumulated_data = d.data
 
-            data.datasets.unshift({
-                fillColor: row.color
-                pointColor: 'transparent'
-                pointStrokeColor: 'transparent'
-                data: accumulated_data
+            data.unshift({
+                label: d.name
+                data: _.zip(days, accumulated_data)
             })
+        options =
+            legend:
+                position: "nw"
+            xaxis:
+                tickSize: [1, "day"],
+                min: moment().subtract('days', 27),
+                max: moment(),
+                mode: "time",
+                daysNames: days,
+                axisLabel: 'Day',
+                axisLabelUseCanvas: true,
+                axisLabelFontSizePixels: 12,
+                axisLabelFontFamily: 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
+                axisLabelPadding: 5
+            series:
+                lines:
+                    show: true
+                    fill: true
+                    fillColor: { colors: _.map(_.values(dataToDraw), (d) -> {'color':d.color}).reverse() }
 
-        new Chart(ctx).Line(data, options)
+            colors: _.map(_.values(dataToDraw), (d) -> d.color).reverse()
+
+
+        plot = element.plot(data, options).data("plot")
 
     scope.$watch attrs.gmIssuesAccumulatedGraph, () ->
         value = scope.$eval(attrs.gmIssuesAccumulatedGraph)

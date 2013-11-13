@@ -21,6 +21,8 @@ module.exports = (grunt) ->
         'app/js/excanvas.js',
         'app/js/jquery.flot.js',
         'app/js/jquery.flot.pie.js',
+        'app/js/jquery.flot.time.js',
+        'app/js/curvedLines.js',
         'app/js/coffeeColorPicker.js',
         'app/js/coffeeColorPicker.angular.js'
     ]
