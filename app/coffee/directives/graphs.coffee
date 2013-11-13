@@ -125,25 +125,29 @@ GmIssuesPieGraphDirective = () -> (scope, elm, attrs) ->
 
     redrawChart = (dataToDraw) ->
         width = element.width()
-        height = width
-        chart = $("<canvas />").attr("width", width).attr("height", height)
-
-        element.empty()
-        element.append(chart)
-
-        ctx = chart.get(0).getContext("2d")
-
+        element.height(width)
+        data = _.map(_.values(dataToDraw), (d) -> { data: d.count, label: d.name})
         options =
-            animation: false
+            series:
+                pie:
+                    show: true
+                    radius: 1
+                    label:
+                        show: true
+                        radius: 3/4
+                        formatter: (label, slice) ->
+                            "<div class='pieLabelText'>#{label}<br/>#{slice.data[0][1]}</div>"
+                        background:
+                            opacity: 0.5
+                            color: 'white'
+            legend:
+                show: false
+            colors: _.map(_.values(dataToDraw), (d) -> d.color)
+            labels: _.map(_.values(dataToDraw), (d) -> d.name)
 
-        data = _.map(_.values(dataToDraw), (x) ->
-            {
-                value : x['count'],
-                color: x['color']
-            }
-        )
 
-        new Chart(ctx).Pie(data, options)
+        plot = element.plot(data, options).data("plot")
+
 
     scope.$watch attrs.gmIssuesPieGraph, () ->
         value = scope.$eval(attrs.gmIssuesPieGraph)
