@@ -36,6 +36,7 @@
     "google-diff-match-patch-js": "~1.0.0",
     "underscore.string": "~2.3.3",
     "markitup": "~1.1.14",
-    "jqueryui-touch-punch": "*"
+    "jqueryui-touch-punch": "*",
+    "favico.js": "0.3.4"
   }
 }
